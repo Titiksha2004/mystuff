@@ -1,0 +1,35 @@
+name: Green Squares
+
+on:
+  workflow_dispatch:
+
+jobs:
+  commit:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Configure Git
+      run: |
+        git config --global user.name "Titiksha K"
+        git config --global user.email "kamanatitiksha@gmail.com"
+
+    - name: Create backdated commits
+      run: |
+        mkdir commit-folder || true
+        cd commit-folder
+
+        for i in {365..1}
+        do
+          export GIT_AUTHOR_DATE=$(date -d "$i days ago" +"%Y-%m-%dT12:00:00")
+          export GIT_COMMITTER_DATE=$GIT_AUTHOR_DATE
+          echo "$GIT_AUTHOR_DATE Commit" >> log.txt
+          git add log.txt
+          git commit -m "Commit on $GIT_AUTHOR_DATE"
+        done
+
+    - name: Push to GitHub
+      run: |
+        git push origin main --force
